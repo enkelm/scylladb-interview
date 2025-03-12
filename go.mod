@@ -1,4 +1,4 @@
-module github.com/enkelm/scylladb-interview/api
+module github.com/enkelm/scylladb-interview
 
 go 1.24.1
 

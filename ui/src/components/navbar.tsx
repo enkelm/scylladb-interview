@@ -1,11 +1,10 @@
-import { ShoppingCart } from "lucide-react";
-import { Button } from "./ui/button";
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuList,
-} from "./ui/navigation-menu";
+} from "@/components/ui/navigation-menu";
 import { ModeToggle } from "./theme/toggle";
+import CartNavButton from "./cart/nav-button";
 
 const Navbar = () => {
   return (
@@ -17,10 +16,7 @@ const Navbar = () => {
       </NavigationMenuList>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <Button>
-            <ShoppingCart />
-            My Cart
-          </Button>
+          <CartNavButton />
         </NavigationMenuItem>
         <NavigationMenuItem>
           <ModeToggle />

@@ -1,4 +1,4 @@
-export type Book = {
+export type IBook = {
   id: string;
   img: string;
   title: string;
