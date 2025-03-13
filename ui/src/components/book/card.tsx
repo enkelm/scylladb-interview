@@ -52,7 +52,9 @@ const BookCard = ({ book }: IProps) => {
       if (c.items.length === 0) {
         return {
           open: false,
-          items: [{ id: book.id, quantity: 1 }],
+          items: [
+            { id: book.id, name: book.title, price: book.price, quantity: 1 },
+          ],
         };
       }
 
@@ -65,6 +67,8 @@ const BookCard = ({ book }: IProps) => {
       } else {
         newCart.items.push({
           id: book.id,
+          name: book.title,
+          price: book.price,
           quantity: 1,
         });
       }

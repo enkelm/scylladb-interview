@@ -20,12 +20,19 @@ type Book struct {
 	Price       float64 `json:"price"`
 }
 
+var cache = make(map[string][]Book)
+
 func GetFreeBooks(query string) ([]Book, error) {
+	if books, ok := cache[query]; ok {
+		return books, nil
+	}
+
 	books := []Book{}
 
 	googleBooks, err := googlebooks.GetBooks(query, 0)
 	if err != nil {
-		return nil, err
+		cache[query] = books
+		return books, err
 	}
 
 	for _, gBook := range googleBooks {
@@ -74,6 +81,7 @@ func GetFreeBooks(query string) ([]Book, error) {
 		books = append(books, book)
 	}
 
+	cache[query] = books
 	return books, nil
 }
 

@@ -1,9 +1,10 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { booksAtom } from "./books";
 
 export type ShoppingCartItem = {
   id: string;
+  name: string;
+  price: number;
   quantity: number;
 };
 
@@ -21,14 +22,10 @@ export const cartAtom = atomWithStorage("shoppingCart", {
 export const isCartOpenAtom = atom((get) => get(cartAtom).open);
 export const cartTotalAtom = atom((get) => {
   const cart = get(cartAtom);
-  const { response: books } = get(booksAtom);
-
   return cart.items.reduce(
     (acc, item) => {
-      const book = books.find((b) => b.id === item.id);
-      if (!book) return acc;
       return {
-        price: acc.price + book.price * item.quantity,
+        price: acc.price + item.price * item.quantity,
         quantity: acc.quantity + item.quantity,
       };
     },

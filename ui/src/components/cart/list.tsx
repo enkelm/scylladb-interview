@@ -3,10 +3,8 @@ import { useAtom, useAtomValue } from "jotai";
 import { Button } from "@/components/ui/button";
 import { useCallback } from "react";
 import CartItemCard from "./card";
-import { booksAtom } from "@/state/books";
 
 const CartList = () => {
-  const { response: books } = useAtomValue(booksAtom);
   const cartTotal = useAtomValue(cartTotalAtom);
   const [cart, setCart] = useAtom(cartAtom);
 
@@ -26,15 +24,12 @@ const CartList = () => {
       onSubmit={submitHandler}
     >
       {cart.items.map((item, index) => {
-        const book = books.find((b) => b.id === item.id);
         return (
           <CartItemCard
             key={"cart-item-" + item.id}
             item={{
               ...item,
               index,
-              name: book?.title ?? "",
-              price: book?.price ?? 0,
             }}
           />
         );
