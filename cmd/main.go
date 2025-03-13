@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"net/http"
 
+	"github.com/enkelm/scylladb-interview/internal/app"
 	"github.com/enkelm/scylladb-interview/ui"
 	"github.com/labstack/echo/v4"
 )
@@ -50,7 +51,19 @@ func main() {
 	})
 
 	e.GET("/api", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
+		books, err := app.GetFreeBooks("nosql")
+		if err != nil {
+			return c.String(http.StatusInternalServerError, fmt.Sprintf("Error: %v", err))
+		}
+		return c.JSON(http.StatusOK, books)
+	})
+	e.GET("/api", func(c echo.Context) error {
+		q := c.QueryParam("q")
+		books, err := app.GetFreeBooks(q)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, fmt.Sprintf("Error: %v", err))
+		}
+		return c.JSON(http.StatusOK, books)
 	})
 	e.Logger.Fatal(e.Start(":6000"))
 }

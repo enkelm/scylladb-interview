@@ -1,16 +1,19 @@
-import { cartAtom } from "@/state/shopping-cart";
-import { useAtom } from "jotai";
+import { cartAtom, cartTotalAtom } from "@/state/shopping-cart";
+import { useAtom, useAtomValue } from "jotai";
 import { Button } from "@/components/ui/button";
 import { useCallback } from "react";
 import CartItemCard from "./card";
+import { booksAtom } from "@/state/books";
 
 const CartList = () => {
+  const { response: books } = useAtomValue(booksAtom);
+  const cartTotal = useAtomValue(cartTotalAtom);
   const [cart, setCart] = useAtom(cartAtom);
 
   const submitHandler = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      setCart({ open: false, items: [], total: { quantity: 0, price: 0 } });
+      setCart({ open: false, items: [] });
     },
     [setCart],
   );
@@ -22,11 +25,22 @@ const CartList = () => {
       className="min-w-md max-h-[800px] px-4 flex flex-col gap-2 overflow-scroll"
       onSubmit={submitHandler}
     >
-      {cart.items.map((item, index) => (
-        <CartItemCard key={"cart-item-" + item.id} item={{ ...item, index }} />
-      ))}
-      <p>Total Quantity: {cart.total.quantity}</p>
-      <p>Total Price: ${cart.total.price.toFixed(2)}</p>
+      {cart.items.map((item, index) => {
+        const book = books.find((b) => b.id === item.id);
+        return (
+          <CartItemCard
+            key={"cart-item-" + item.id}
+            item={{
+              ...item,
+              index,
+              name: book?.title ?? "",
+              price: book?.price ?? 0,
+            }}
+          />
+        );
+      })}
+      <p>Total Quantity: {cartTotal.quantity}</p>
+      <p>Total Price: ${cartTotal.price.toFixed(2)}</p>
       <Button type="submit">Checkout</Button>
     </form>
   );

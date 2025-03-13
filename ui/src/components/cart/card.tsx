@@ -1,12 +1,12 @@
 import { cartAtom, ShoppingCartItem } from "@/state/shopping-cart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useSetAtom } from "jotai";
 import { Button } from "@/components/ui/button";
 import { CircleX } from "lucide-react";
+import { useSetAtom } from "jotai";
 
 type IProps = {
-  item: ShoppingCartItem & { index: number };
+  item: ShoppingCartItem & { index: number; name: string; price: number };
 };
 const CartItemCard = ({ item }: IProps) => {
   const setCart = useSetAtom(cartAtom);
@@ -21,11 +21,7 @@ const CartItemCard = ({ item }: IProps) => {
         newCart.items[item.index].quantity = quantity;
       }
 
-      const quantityChange = quantity - item.quantity;
-      newCart.total.quantity += quantityChange;
-      newCart.total.price += quantityChange * item.price;
-
-      if (newCart.total.quantity === 0 && newCart.total.price === 0) {
+      if (newCart.items.length === 0) {
         newCart.open = false;
       }
       return newCart;

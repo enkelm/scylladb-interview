@@ -1,6 +1,8 @@
 # Global
 **/.zed
 **/.vscode
+**/.DS_Store
+
 
 # UI
 ## Logs
@@ -20,7 +22,6 @@ ui/*.local
 ## Editor directories and files
 ui/!.vscode/extensions.json
 ui/.idea
-ui/.DS_Store
 ui/*.suo
 ui/*.ntvs*
 ui/*.njsproj

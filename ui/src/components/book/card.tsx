@@ -10,6 +10,37 @@ import {
 } from "@/components/ui/card";
 import { cartAtom } from "@/state/shopping-cart";
 import { useSetAtom } from "jotai";
+import { Skeleton } from "@/components/ui/skeleton";
+
+export const BookCardSkeleton = () => {
+  return (
+    <Card className="flex-row gap-4 px-4">
+      <section></section>
+      {/* <img src={book.image} alt={book.title} /> */}
+      <Skeleton className="w-24 h-32" />
+      <section className="flex flex-col gap-2">
+        <CardHeader>
+          <CardTitle className="font-semibold">
+            <Skeleton />
+          </CardTitle>
+          <CardDescription className="text-sm font-extralight">
+            <Skeleton />
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Skeleton />
+          <div className="my-2">
+            <Skeleton />
+            <Skeleton />
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Skeleton />
+        </CardFooter>
+      </section>
+    </Card>
+  );
+};
 
 type IProps = {
   book: IBook;
@@ -18,13 +49,10 @@ const BookCard = ({ book }: IProps) => {
   const setCart = useSetAtom(cartAtom);
   const addToCartHandler = () =>
     setCart((c) => {
-      if (!c.items && !c.total) {
+      if (c.items.length === 0) {
         return {
           open: false,
-          items: [
-            { id: book.id, name: book.title, quantity: 1, price: book.price },
-          ],
-          total: { price: book.price, quantity: 1 },
+          items: [{ id: book.id, quantity: 1 }],
         };
       }
 
@@ -37,19 +65,15 @@ const BookCard = ({ book }: IProps) => {
       } else {
         newCart.items.push({
           id: book.id,
-          name: book.title,
           quantity: 1,
-          price: book.price,
         });
       }
-      newCart.total.price += book.price;
-      newCart.total.quantity += 1;
       return newCart;
     });
 
   return (
     <Card key={book.id} className="flex-row gap-4 px-4">
-      <img width="200" height="200" src={book.img} alt={book.title} />
+      <img src={book.image} alt={book.title} />
       <section className="flex flex-col gap-2">
         <CardHeader>
           <CardTitle className="font-semibold">{book.title}</CardTitle>
