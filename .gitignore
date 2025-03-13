@@ -1,4 +1,5 @@
 # Global
+bin/
 **/.zed
 **/.vscode
 **/.DS_Store
