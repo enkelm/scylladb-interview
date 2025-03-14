@@ -8,7 +8,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// GetBooks handles the request to get books based on a query parameter
 func GetBooks(c echo.Context) error {
 	query := c.QueryParam("q")
 	if query == "" {

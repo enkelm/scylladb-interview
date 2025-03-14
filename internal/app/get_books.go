@@ -33,7 +33,8 @@ func GetFreeBooks(query string) ([]Book, error) {
 			Author:      "Unkown",
 			Description: gBook.VolumeInfo.Description,
 			PageCount:   gBook.VolumeInfo.PageCount,
-			Price:       math.Max(4.99, float64(math.Floor(rand.Float64()*100)/100)+float64(rand.IntN(61))),
+			// books were mostly free so prices are mocked
+			Price: math.Max(4.99, float64(math.Floor(rand.Float64()*100)/100)+float64(rand.IntN(61))),
 		}
 
 		if len(gBook.VolumeInfo.Authors) > 0 {

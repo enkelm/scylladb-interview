@@ -8,17 +8,13 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// RegisterUIHandlers sets up all the UI/frontend related routes
 func RegisterUIHandlers(e *echo.Echo) {
-	// Set up static file server
 	assetHandler := http.FileServer(http.FS(ui.DistDirFS))
 	e.GET("/static/*", echo.WrapHandler(http.StripPrefix("/static", assetHandler)))
 
-	// SPA handler - serve index.html for all unmatched routes
 	e.GET("/*", serveUI(assetHandler))
 }
 
-// serveUI handles serving the UI files with SPA fallback to index.html
 func serveUI(assetHandler http.Handler) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		path := c.Request().URL.Path
@@ -38,7 +34,6 @@ func serveUI(assetHandler http.Handler) echo.HandlerFunc {
 	}
 }
 
-// ListFiles is a debug handler that lists all files in the UI distribution
 func ListFiles(c echo.Context) error {
 	var files []string
 	err := fs.WalkDir(ui.DistDirFS, ".", func(p string, d fs.DirEntry, err error) error {
