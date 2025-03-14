@@ -9,17 +9,6 @@ import (
 	"github.com/enkelm/scylladb-interview/internal/apiclient/openlibrary"
 )
 
-type Book struct {
-	Id          string  `json:"id"`
-	ISBN        string  `json:"isbn"`
-	Image       string  `json:"image"`
-	Title       string  `json:"title"`
-	Author      string  `json:"author"`
-	Description string  `json:"description"`
-	PageCount   int     `json:"pageCount"`
-	Price       float64 `json:"price"`
-}
-
 var cache = make(map[string][]Book)
 
 func GetFreeBooks(query string) ([]Book, error) {
