@@ -20,7 +20,7 @@ const CartList = () => {
 
   return (
     <form
-      className="min-w-md max-h-[800px] px-4 flex flex-col gap-2 overflow-scroll"
+      className="min-w-md max-h-[800px] px-4 pb-4 flex flex-col gap-2 overflow-scroll"
       onSubmit={submitHandler}
     >
       {cart.items.map((item, index) => {

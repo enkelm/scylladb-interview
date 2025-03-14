@@ -14,13 +14,13 @@ function RouteComponent() {
 
   return (
     <>
-      <BookSearch />
-      <section className="px-4">
-        <h5 className="text-lg font-semibold mb-4">Books</h5>
-        <section className={open ? "flex gap-4" : ""}>
+      <section className={`${open ? "flex gap-4" : ""} px-4`}>
+        <div>
+          <BookSearch />
+          <h5 className="text-lg font-semibold mb-4">Books</h5>
           <BookList />
-          <CartList />
-        </section>
+        </div>
+        <CartList />
       </section>
     </>
   );

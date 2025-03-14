@@ -42,7 +42,7 @@ const BookSearch = () => {
   );
 
   return (
-    <form className="px-4 mb-4 flex gap-4" onSubmit={submitHandler}>
+    <form className="mb-4 flex gap-4" onSubmit={submitHandler}>
       <Input name="q" defaultValue="nosql" onChange={inputChangeHandler} />
       <Button ref={buttonRef} type="submit">
         {loading ? <Loader2 className="animate-spin" /> : <Search />}
