@@ -1,6 +1,18 @@
 # ScyllaDB Interview Project
 
 This repository contains a web application built with Go (Backend) and React (Frontend).
+
+## Bonus features
+### UI
+- Search
+- Local Storage
+- Dark mode
+- Description collapse/expand
+
+### API
+- Dockerization
+- Simple Caching
+
 ## Dependencies
 
 ### Backend
@@ -99,4 +111,3 @@ The production container exposes port 6000.
 - `make build-api`: Build only the backend for development
 - `make build-api-prod`: Build only the backend for production
 - `make build-ui`: Build only the frontend
-
