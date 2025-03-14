@@ -16,7 +16,6 @@ export type ShoppingCart = {
 export const cartAtom = atomWithStorage("shoppingCart", {
   open: false,
   items: [],
-  total: { price: 0, quantity: 0 },
 } as ShoppingCart);
 
 export const isCartOpenAtom = atom((get) => get(cartAtom).open);
