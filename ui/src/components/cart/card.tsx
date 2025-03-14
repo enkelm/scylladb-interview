@@ -15,7 +15,7 @@ const CartItemCard = ({ item }: IProps) => {
     setCart((prevCart) => {
       const newCart = structuredClone(prevCart);
 
-      if (quantity <= 0) {
+      if (isNaN(quantity) || quantity <= 0) {
         newCart.items.splice(item.index, 1);
       } else {
         newCart.items[item.index].quantity = quantity;
