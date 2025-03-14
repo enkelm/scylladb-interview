@@ -2,31 +2,6 @@
 
 This repository contains a web application built with Go (Backend) and React (Frontend).
 
-## Bonus features
-### UI
-- Search
-- Local Storage
-- Dark mode
-- Description collapse/expand
-
-### API
-- Dockerization
-- Simple Caching
-
-## Dependencies
-
-### Backend
-- Go 1.24.1
-- Echo v4.13.3 (Web framework)
-
-### Frontend
-- React 19
-- Vite (Build tool)
-- TanStack Router (Routing)
-- Tailwind CSS (Styling)
-- Shadcn UI (UI components)
-- TypeScript
-
 ## Prerequisites
 
 To run this project, you'll need:
@@ -89,6 +64,31 @@ make run-prod
 This command:
 1. Builds a Docker image for the application
 2. Runs the container with port 6000 exposed
+
+## Bonus features
+### UI
+- Search
+- Local Storage
+- Dark mode
+- Description collapse/expand
+
+### API
+- Dockerization
+- Simple Caching
+
+## Dependencies
+
+### Backend
+- Go 1.24.1
+- Echo v4.13.3 (Web framework)
+
+### Frontend
+- React 19
+- Vite (Build tool)
+- TanStack Router (Routing)
+- Tailwind CSS (Styling)
+- Shadcn UI (UI components)
+- TypeScript
 
 ## Project Structure
 
