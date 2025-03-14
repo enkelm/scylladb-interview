@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const BookCardSkeleton = () => {
   return (
-    <Card className="flex-row gap-2 px-4">
+    <Card className="flex-row gap-2 px-4 min-w-[calc(100vw-31rem)]">
       <Skeleton className="max-w-[300px] max-h-[300px] w-[150px] h-[200px] self-start" />
       <section className="flex flex-1 flex-col gap-2">
         <CardHeader>
