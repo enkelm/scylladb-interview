@@ -15,7 +15,7 @@ const CartNavButton = () => {
 
   return (
     <section className="p-1">
-      <Button onClick={clickHandler}>
+      <Button disabled={cartTotal.quantity === 0} onClick={clickHandler}>
         <ShoppingCart />
         My Cart
       </Button>

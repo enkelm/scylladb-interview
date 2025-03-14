@@ -10,42 +10,56 @@ import {
 } from "@/components/ui/card";
 import { cartAtom } from "@/state/shopping-cart";
 import { useSetAtom } from "jotai";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
-export const BookCardSkeleton = () => {
+enum ExpandedStatus {
+  Default,
+  Expanded,
+  Collapsed,
+}
+const statusMap = new Map<ExpandedStatus, ExpandedStatus>([
+  [ExpandedStatus.Default, ExpandedStatus.Default],
+  [ExpandedStatus.Expanded, ExpandedStatus.Collapsed],
+  [ExpandedStatus.Collapsed, ExpandedStatus.Expanded],
+]);
+
+const BookDescription = ({ description }: { description: string }) => {
+  const [status, setStatus] = useState<ExpandedStatus | null>(null);
+
+  const isExpanded = status === ExpandedStatus.Expanded;
+  const isExpandedByDefault = status === ExpandedStatus.Default;
+
+  const toggleExpandHandler = () => {
+    const selection = window.getSelection();
+    if (selection && selection.toString().length !== 0) return;
+    setStatus((s) => {
+      if (s === null) return s;
+      return statusMap.get(s) ?? s;
+    });
+  };
+
   return (
-    <Card className="flex-row gap-4 px-4">
-      <section></section>
-      {/* <img src={book.image} alt={book.title} /> */}
-      <Skeleton className="w-24 h-32" />
-      <section className="flex flex-col gap-2">
-        <CardHeader>
-          <CardTitle className="font-semibold">
-            <Skeleton />
-          </CardTitle>
-          <CardDescription className="text-sm font-extralight">
-            <Skeleton />
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Skeleton />
-          <div className="my-2">
-            <Skeleton />
-            <Skeleton />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Skeleton />
-        </CardFooter>
-      </section>
-    </Card>
+    <p
+      ref={(ref) => {
+        if (!ref || status !== null) return;
+        setStatus(
+          ref.scrollHeight <= ref.clientHeight
+            ? ExpandedStatus.Default
+            : ExpandedStatus.Collapsed,
+        );
+      }}
+      className={`${isExpanded || isExpandedByDefault ? "" : "max-h-24 line-clamp-3 hover:text-gray-500 dark:hover:text-gray-300"} ${isExpandedByDefault ? "" : "cursor-pointer"} text-sm overflow-hidden text-ellipsis transition-colors`}
+      onClick={toggleExpandHandler}
+    >
+      {description}
+    </p>
   );
 };
 
-type IProps = {
+type IBookCardProps = {
   book: IBook;
 };
-const BookCard = ({ book }: IProps) => {
+const BookAddToCartButton = ({ book }: IBookCardProps) => {
   const setCart = useSetAtom(cartAtom);
   const addToCartHandler = () =>
     setCart((c) => {
@@ -76,9 +90,21 @@ const BookCard = ({ book }: IProps) => {
     });
 
   return (
-    <Card key={book.id} className="flex-row gap-4 px-4">
-      <img src={book.image} alt={book.title} />
-      <section className="flex flex-col gap-2">
+    <Button className="w-full" onClick={addToCartHandler}>
+      Add to cart
+    </Button>
+  );
+};
+
+const BookCard = ({ book }: IBookCardProps) => {
+  return (
+    <Card key={book.id} className="flex-row gap-2 px-4">
+      <img
+        src={book.image}
+        alt={book.title}
+        className="max-w-[300px] max-h-[300px] object-contain self-start"
+      />
+      <section className="flex flex-1 flex-col gap-2">
         <CardHeader>
           <CardTitle className="font-semibold">{book.title}</CardTitle>
           <CardDescription className="text-sm font-extralight">
@@ -86,16 +112,14 @@ const BookCard = ({ book }: IProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p>{book.description}</p>
+          <BookDescription description={book.description} />
           <div className="my-2">
             <p>Pages:&nbsp;{book.pageCount}</p>
             <p>Price:&nbsp;${book.price}</p>
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full" onClick={addToCartHandler}>
-            Add to cart
-          </Button>
+          <BookAddToCartButton book={book} />
         </CardFooter>
       </section>
     </Card>
