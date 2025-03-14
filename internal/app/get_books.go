@@ -1,40 +1,45 @@
 package app
 
 import (
-	"fmt"
 	"math"
 	"math/rand/v2"
 
 	"github.com/enkelm/scylladb-interview/internal/apiclient/googlebooks"
 	"github.com/enkelm/scylladb-interview/internal/apiclient/openlibrary"
+	"github.com/enkelm/scylladb-interview/internal/logger"
 )
 
 var cache = make(map[string][]Book)
 
 func GetFreeBooks(query string) ([]Book, error) {
+	log := logger.Get()
+
 	if books, ok := cache[query]; ok {
+		log.Debug("Returning %d cached books for query: %s", len(books), query)
 		return books, nil
 	}
 
+	log.Info("Fetching books from Google Books API for query: %s", query)
 	books := []Book{}
 
 	googleBooks, err := googlebooks.GetBooks(query, 0)
 	if err != nil {
+		log.Error("Failed to fetch books from Google Books API: %v", err)
 		cache[query] = books
 		return books, err
 	}
 
+	log.Debug("Processing %d Google Books results for query: %s", len(googleBooks), query)
+
 	for _, gBook := range googleBooks {
-		fmt.Printf("%+v\n", gBook)
 		book := Book{
 			Id:          gBook.Id,
 			Image:       gBook.VolumeInfo.ImageLinks.Thumbnail,
 			Title:       gBook.VolumeInfo.Title,
-			Author:      "Unkown",
+			Author:      "Unknown",
 			Description: gBook.VolumeInfo.Description,
 			PageCount:   gBook.VolumeInfo.PageCount,
-			// books were mostly free so prices are mocked
-			Price: math.Max(4.99, float64(math.Floor(rand.Float64()*100)/100)+float64(rand.IntN(61))),
+			Price:       math.Max(4.99, float64(math.Floor(rand.Float64()*100)/100)+float64(rand.IntN(61))),
 		}
 
 		if len(gBook.VolumeInfo.Authors) > 0 {
@@ -42,39 +47,47 @@ func GetFreeBooks(query string) ([]Book, error) {
 		}
 
 		for _, identifier := range gBook.VolumeInfo.Identifiers {
-			fmt.Printf("\n\n\n")
 			if identifier.Id == "" || identifier.Type == googlebooks.ISBN_UNKNOWN {
 				continue
 			}
+
+			log.Debug("Fetching details from OpenLibrary for ISBN: %s", identifier.Id)
 			openLibBook, err := openlibrary.GetBook(identifier.Id)
 			if err != nil {
+				log.Debug("Failed to fetch OpenLibrary data for ISBN %s: %v", identifier.Id, err)
 				continue
 			}
-			fmt.Println("### OPEN LIB ##")
-			fmt.Printf("%+v\n", openLibBook)
-			fmt.Println("### OPEN LIB ##")
-			if openLibBook.LatestRevision > 1 {
-				work, err := openlibrary.GetWorks(openLibBook.Works[0].Key)
+
+			if openLibBook.LatestRevision > 1 && len(openLibBook.Works) > 0 {
+				workKey := openLibBook.Works[0].Key
+				log.Debug("Fetching work details for: %s", workKey)
+
+				work, err := openlibrary.GetWorks(workKey)
 				if err != nil {
+					log.Debug("Failed to fetch work details: %v", err)
 					continue
 				}
-				fmt.Println("### OPEN LIB WORK ##")
-				fmt.Printf("%+v\n", work)
-				fmt.Println("### OPEN LIB WORK ##")
+
 				if work.Description != "" {
+					log.Debug("Using OpenLibrary description for book: %s", gBook.Id)
 					book.Description = work.Description
 				}
 			}
+
 			book.ISBN = identifier.Id
 			break
 		}
+
 		books = append(books, book)
 	}
 
+	log.Info("Caching %d books for query: %s", len(books), query)
 	cache[query] = books
 	return books, nil
 }
 
+// abandoned for simplicity
+// recursively fetch paid books to find paid books by batches of 10
 func GetPaidBooks() ([]googlebooks.BookResponse, error) {
 	return getPaidBatch([]googlebooks.BookResponse{}, 0)
 }
@@ -96,8 +109,6 @@ func getPaidBatch(books []googlebooks.BookResponse, startIndex int) ([]googleboo
 	}
 
 	startIndex += 10
-	fmt.Printf("%+v\n", books)
-	fmt.Printf("%d\n", startIndex)
 
 	getPaidBatch(books, startIndex)
 	return books, nil
