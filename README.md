@@ -111,3 +111,6 @@ The production container exposes port 6000.
 - `make build-api`: Build only the backend for development
 - `make build-api-prod`: Build only the backend for production
 - `make build-ui`: Build only the frontend
+
+# Part 2: ScyllaDB Calculator
+[Here](https://docs.google.com/document/d/1HnEMMYiWM0-LSP8dBfLNF86RVL4Qh0TnYmMU4Bczbpc/edit?usp=sharing) you can find the link to a google doc explaining the ScyllaDB Calculator design.
