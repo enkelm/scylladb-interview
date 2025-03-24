@@ -5,15 +5,7 @@ import { booksAtom, initialBooksResponse } from "@/state/books";
 import { Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import BookPagination from "./pagination";
 import { Route } from "@/routes";
 
 const BookSearch = () => {
@@ -62,45 +54,7 @@ const BookSearch = () => {
   return (
     <form className="mb-4 flex gap-4" onSubmit={submitHandler}>
       <Input name="q" defaultValue={q} onChange={inputChangeHandler} />
-
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious />
-          </PaginationItem>
-          {page > 0 && (
-            <PaginationItem>
-              <PaginationEllipsis
-                onClick={() =>
-                  navigate({ search: (prev) => ({ ...prev, page: 0 }) })
-                }
-              />
-            </PaginationItem>
-          )}
-          {new Array(3).fill(undefined).map((_, index) => {
-            const value = page + index;
-            return (
-              <PaginationItem key={`pagination-${index}`}>
-                <PaginationLink
-                  isActive={value === page}
-                  onClick={() =>
-                    navigate({ search: (prev) => ({ ...prev, page: value }) })
-                  }
-                >
-                  {value + 1}
-                </PaginationLink>
-              </PaginationItem>
-            );
-          })}
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-
+      <BookPagination />
       <Button ref={buttonRef} type="submit">
         {loading ? <Loader2 className="animate-spin" /> : <Search />}
         Search
