@@ -11,7 +11,7 @@ const BookList = memo(() => {
   } = useAtomValue(booksAtom);
 
   const booksList = !loading
-    ? books.map((b) => <BookCard key={b.id} book={b} />)
+    ? books.map((b) => <BookCard key={`book-list-item-${b.id}`} book={b} />)
     : new Array(5).fill(<BookCardSkeleton />);
 
   return (

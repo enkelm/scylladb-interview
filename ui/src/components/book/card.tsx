@@ -98,11 +98,11 @@ const BookAddToCartButton = ({ book }: IBookCardProps) => {
 
 const BookCard = ({ book }: IBookCardProps) => {
   return (
-    <Card key={book.id} className="flex-row gap-2 px-4">
+    <Card className="flex-row gap-2 px-4">
       <img
-        src={book.image}
+        src={book.image || "/empty.png"}
         alt={book.title}
-        className="max-w-[300px] max-h-[300px] object-contain self-start"
+        className={`max-w-[300px] max-h-[300px] object-contain self-start ${!book.image ? "dark:invert" : ""}`}
       />
       <section className="flex flex-1 flex-col gap-2">
         <CardHeader>
