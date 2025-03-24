@@ -14,17 +14,17 @@ import (
 const base_url = "https://www.googleapis.com/books/v1/volumes?q=%s&maxAllowedMaturityRating=not-mature&startIndex=%d&maxResults=10"
 
 var (
-	cache      = make(map[string][]BookResponse)
+	cache      = make(map[string]VolumesResponse)
 	httpClient = &http.Client{Timeout: 10 * time.Second}
 )
 
-func GetBooks(query string, startIndex int) ([]BookResponse, error) {
+func GetBooks(query string, startIndex int) (VolumesResponse, error) {
 	log := logger.Get()
 
 	endpoint := fmt.Sprintf(base_url, query, startIndex)
-	if items, ok := cache[endpoint]; ok {
+	if response, ok := cache[endpoint]; ok {
 		log.Debug("Returning cached Google Books results for query: %s", query)
-		return items, nil
+		return response, nil
 	}
 
 	log.Info("Fetching books from Google Books API: %s (startIndex: %d)", query, startIndex)
@@ -35,8 +35,8 @@ func GetBooks(query string, startIndex int) ([]BookResponse, error) {
 
 	if err != nil {
 		log.Error("HTTP request failed: %v", err)
-		cache[endpoint] = nil
-		return nil, err
+		cache[endpoint] = VolumesResponse{}
+		return VolumesResponse{}, err
 	}
 	defer res.Body.Close()
 
@@ -59,20 +59,20 @@ func GetBooks(query string, startIndex int) ([]BookResponse, error) {
 			}
 		}
 
-		cache[endpoint] = nil
-		return nil, &errResp
+		cache[endpoint] = VolumesResponse{}
+		return VolumesResponse{}, &errResp
 	}
 
 	var resp VolumesResponse
 	if err := json.NewDecoder(res.Body).Decode(&resp); err != nil {
 		log.Error("Failed to decode API response: %v", err)
-		cache[endpoint] = nil
-		return nil, err
+		cache[endpoint] = VolumesResponse{}
+		return VolumesResponse{}, err
 	}
 
 	log.Info("Successfully retrieved %d books from Google Books API for query: %s",
 		len(resp.Items), query)
 
-	cache[endpoint] = resp.Items
-	return resp.Items, nil
+	cache[endpoint] = resp
+	return resp, nil
 }

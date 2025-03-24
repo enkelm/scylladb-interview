@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/enkelm/scylladb-interview/internal/app"
 	"github.com/enkelm/scylladb-interview/internal/logger"
@@ -20,12 +21,19 @@ func GetBooks(c echo.Context) error {
 		log.Debug("Processing book query: %s", query)
 	}
 
-	books, err := app.GetFreeBooks(query)
+	pageParam := c.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		page = 0 // Default page
+		log.Debug("Using default page: %d", page)
+	}
+
+	resp, err := app.GetFreeBooks(query, page)
 	if err != nil {
 		log.Error("Failed to get books for query '%s': %v", query, err)
 		return c.String(http.StatusInternalServerError, fmt.Sprintf("Error: %v", err))
 	}
 
-	log.Info("Retrieved %d books for query: %s", len(books), query)
-	return c.JSON(http.StatusOK, books)
+	log.Info("Retrieved %d books for query: %s", len(resp.Items), query)
+	return c.JSON(http.StatusOK, resp)
 }

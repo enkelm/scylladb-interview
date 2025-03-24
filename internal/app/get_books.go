@@ -3,6 +3,7 @@ package app
 import (
 	"math"
 	"math/rand/v2"
+	"strconv"
 	"sync"
 
 	"github.com/enkelm/scylladb-interview/internal/apiclient/googlebooks"
@@ -10,33 +11,34 @@ import (
 	"github.com/enkelm/scylladb-interview/internal/logger"
 )
 
-var cache = make(map[string][]Book)
+var cache = make(map[string]PagedBooks)
 
-func GetFreeBooks(query string) ([]Book, error) {
+func GetFreeBooks(query string, page int) (PagedBooks, error) {
 	log := logger.Get()
 
-	if books, ok := cache[query]; ok {
-		log.Debug("Returning %d cached books for query: %s", len(books), query)
-		return books, nil
+	if resp, ok := cache[query+strconv.Itoa(page)]; ok {
+		log.Debug("Returning %d cached books for query: %s", len(resp.Items), query)
+		return resp, nil
 	}
 
 	log.Info("Fetching books from Google Books API for query: %s", query)
-	books := []Book{}
+	var response PagedBooks
 
-	googleBooks, err := googlebooks.GetBooks(query, 0)
+	googleBooks, err := googlebooks.GetBooks(query, page*10)
 	if err != nil {
 		log.Error("Failed to fetch books from Google Books API: %v", err)
-		cache[query] = books
-		return books, err
+		cache[query+strconv.Itoa(page)] = response
+		return response, err
 	}
+	response.TotalCount = googleBooks.TotalCount
 
-	log.Debug("Processing %d Google Books results for query: %s", len(googleBooks), query)
+	log.Debug("Processing %d Google Books results for query: %s", len(googleBooks.Items), query)
 
-	bookCount := len(googleBooks)
+	bookCount := len(googleBooks.Items)
 	booksChan := make(chan Book, bookCount)
 	var wg sync.WaitGroup
 
-	for _, gBook := range googleBooks {
+	for _, gBook := range googleBooks.Items {
 		wg.Add(1)
 		go func(gBook googlebooks.BookResponse) {
 			defer wg.Done()
@@ -50,14 +52,14 @@ func GetFreeBooks(query string) ([]Book, error) {
 		close(booksChan)
 	}()
 
-	books = make([]Book, 0, bookCount)
+	response.Items = make([]Book, 0, bookCount)
 	for book := range booksChan {
-		books = append(books, book)
+		response.Items = append(response.Items, book)
 	}
 
-	log.Info("Caching %d books for query: %s", len(books), query)
-	cache[query] = books
-	return books, nil
+	log.Info("Caching %d books for query: %s", len(response.Items), query)
+	cache[query] = response
+	return response, nil
 }
 
 func processGoogleBook(gBook googlebooks.BookResponse, log *logger.Logger) Book {
@@ -126,7 +128,7 @@ func getPaidBatch(books []googlebooks.BookResponse, startIndex int) ([]googleboo
 		return nil, err
 	}
 
-	for _, book := range nextBooks {
+	for _, book := range nextBooks.Items {
 		if len(books) < 10 {
 			books = append(books, book)
 		}

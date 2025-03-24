@@ -7,6 +7,12 @@ import BookSearch from "@/components/book/search";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      q: (search?.q as string) ?? "nosql",
+      page: Number(search?.page ?? 0),
+    };
+  },
 });
 
 function RouteComponent() {

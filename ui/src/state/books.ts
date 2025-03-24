@@ -1,12 +1,13 @@
-import type { IBook } from "@/api/types";
+import type { IPagedBooks } from "@/api/types";
 import { atom } from "jotai";
 
 type IBookAtom = {
   loading: boolean;
-  response: IBook[];
+  response: IPagedBooks;
 };
 
+export const initialBooksResponse = { items: [], totalCount: 0 };
 export const booksAtom = atom<IBookAtom>({
   loading: false,
-  response: [],
+  response: initialBooksResponse,
 });

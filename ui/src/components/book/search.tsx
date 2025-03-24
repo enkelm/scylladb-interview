@@ -1,24 +1,39 @@
 import { useAtom } from "jotai/react";
 import { useCallback, useEffect, useRef } from "react";
 import getBooks from "@/api/getBooks";
-import { booksAtom } from "@/state/books";
+import { booksAtom, initialBooksResponse } from "@/state/books";
 import { Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Route } from "@/routes";
 
 const BookSearch = () => {
+  const { q, page } = Route.useSearch();
+  const navigate = Route.useNavigate();
+
   const [{ loading }, setBooks] = useAtom(booksAtom);
 
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const searchBooks = useCallback(
-    (query = "nosql") => {
-      setBooks({ loading: true, response: [] });
-      getBooks(query)
-        .then((books) => setBooks({ loading: false, response: books }))
-        .catch(() => setBooks({ loading: false, response: [] }));
+    (query = q, index = page) => {
+      setBooks({ loading: true, response: initialBooksResponse });
+      getBooks(query, index)
+        .then((response) => setBooks({ loading: false, response }))
+        .catch(() =>
+          setBooks({ loading: false, response: initialBooksResponse }),
+        );
     },
-    [setBooks],
+    [page, q, setBooks],
   );
 
   useEffect(() => {
@@ -28,22 +43,64 @@ const BookSearch = () => {
   const inputChangeHandler = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!buttonRef.current) return;
-      buttonRef.current.disabled = e.target.value.trim() === "";
+      const q = e.target.value.trim();
+      buttonRef.current.disabled = q === "";
     },
-    [buttonRef],
+    [],
   );
 
   const submitHandler = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      searchBooks(e.currentTarget?.q.value);
+      navigate({
+        search: (prev) => ({ ...prev, q: e.currentTarget?.q.value }),
+      });
     },
-    [searchBooks],
+    [navigate],
   );
 
   return (
     <form className="mb-4 flex gap-4" onSubmit={submitHandler}>
-      <Input name="q" defaultValue="nosql" onChange={inputChangeHandler} />
+      <Input name="q" defaultValue={q} onChange={inputChangeHandler} />
+
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious />
+          </PaginationItem>
+          {page > 0 && (
+            <PaginationItem>
+              <PaginationEllipsis
+                onClick={() =>
+                  navigate({ search: (prev) => ({ ...prev, page: 0 }) })
+                }
+              />
+            </PaginationItem>
+          )}
+          {new Array(3).fill(undefined).map((_, index) => {
+            const value = page + index;
+            return (
+              <PaginationItem key={`pagination-${index}`}>
+                <PaginationLink
+                  isActive={value === page}
+                  onClick={() =>
+                    navigate({ search: (prev) => ({ ...prev, page: value }) })
+                  }
+                >
+                  {value + 1}
+                </PaginationLink>
+              </PaginationItem>
+            );
+          })}
+          <PaginationItem>
+            <PaginationEllipsis />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+
       <Button ref={buttonRef} type="submit">
         {loading ? <Loader2 className="animate-spin" /> : <Search />}
         Search

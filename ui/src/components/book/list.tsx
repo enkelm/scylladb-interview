@@ -5,7 +5,10 @@ import { booksAtom } from "@/state/books";
 import { memo } from "react";
 
 const BookList = memo(() => {
-  const { loading, response: books } = useAtomValue(booksAtom);
+  const {
+    loading,
+    response: { items: books },
+  } = useAtomValue(booksAtom);
 
   const booksList = !loading
     ? books.map((b) => <BookCard key={b.id} book={b} />)

@@ -1,5 +1,10 @@
 package app
 
+type PagedBooks struct {
+	TotalCount int    `json:"totalCount"`
+	Items      []Book `json:"items"`
+}
+
 type Book struct {
 	Id          string  `json:"id"`
 	ISBN        string  `json:"isbn"`
